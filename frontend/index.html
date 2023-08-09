@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CCTV IPs</title>
+  <style>
+    /* CSS untuk pesan loading */
+    .loading-message {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>CCTV IPs</h1>
+  <select id="country-select">
+    <!-- Pilihan negara -->
+  </select>
+  <button onclick="getIPs()">Get IPs</button>
+
+  <!-- Div untuk menampilkan pesan loading -->
+  <div class="loading-message" id="loading-message">Loading...</div>
+
+  <div id="ip-list">
+    <!-- Daftar IP akan ditampilkan di sini -->
+  </div>
+
+  <script>
+    // Fungsi untuk menampilkan pesan loading
+    function showLoading() {
+      document.getElementById("loading-message").style.display = "block";
+    }
+
+    // Fungsi untuk menyembunyikan pesan loading
+    function hideLoading() {
+      document.getElementById("loading-message").style.display = "none";
+    }
+
+    // Fungsi untuk mendapatkan IP menggunakan AJAX
+    function getIPs() {
+      var countrySelect = document.getElementById("country-select");
+      var selectedCountry = countrySelect.value;
+
+      showLoading(); // Menampilkan pesan loading sebelum permintaan dimulai
+
+      // Lakukan permintaan AJAX
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://localhost:5000/api/cctv/" + selectedCountry, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          hideLoading(); // Sembunyikan pesan loading setelah permintaan selesai
+
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            var ipList = response.ip_addresses.join("<br>");
+            document.getElementById("ip-list").innerHTML = ipList;
+          } else {
+            document.getElementById("ip-list").innerHTML = "Error: " + xhr.statusText;
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    // Isi pilihan negara di dropdown select
+    var countries = ["US", "JP", "IT", "KR", "FR", "DE", "TW", "RU", "GB", "NL"];
+    var countrySelect = document.getElementById("country-select");
+    countries.forEach(function (country) {
+      var option = document.createElement("option");
+      option.text = country;
+      countrySelect.add(option);
+    });
+  </script>
+</body>
+</html>
